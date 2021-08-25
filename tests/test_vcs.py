@@ -38,7 +38,7 @@ def test_fetch_with_git_http_url_returns_a_response(mock_backend):
 @mock.patch("fetchcode.vcs.vcs.get_backend_for_scheme")
 def test_fetch_with_git_url_returns_a_response(mock_backend):
     mock_backend.return_value.obtain = obtain
-    url = "git://github.com/jamesor/mongoose-versioner"
+    url = "git+git://github.com/jamesor/mongoose-versioner"
     response = fetch_via_vcs(url=url)
     assert response.vcs_type == "git"
     assert response.domain == "github.com"
@@ -101,7 +101,7 @@ def test_fetch_with_bzr_https_url_returns_a_response(mock_backend):
 @mock.patch("fetchcode.vcs.vcs.get_backend_for_scheme")
 def test_fetch_with_bzr_url_returns_a_response(mock_backend):
     mock_backend.return_value.obtain = obtain
-    url = "bzr://gitlab.com/jamesor/mongoose-versioner"
+    url = "bzr+file://gitlab.com/jamesor/mongoose-versioner"
     response = fetch_via_vcs(url=url)
     assert response.vcs_type == "bzr"
     assert response.domain == "gitlab.com"
@@ -146,7 +146,7 @@ def test_fetch_with_bzr_lp_url_returns_a_response(mock_backend):
 @mock.patch("fetchcode.vcs.vcs.get_backend_for_scheme")
 def test_fetch_with_hg_url_returns_a_response(mock_backend):
     mock_backend.return_value.obtain = obtain
-    url = "hg://bitbucket.com/jamesor/mongoose-versioner"
+    url = "hg+file://bitbucket.com/jamesor/mongoose-versioner"
     response = fetch_via_vcs(url=url)
     assert response.vcs_type == "hg"
     assert response.domain == "bitbucket.com"
@@ -200,7 +200,7 @@ def test_fetch_with_hg_static_http_url_returns_a_response(mock_backend):
 @mock.patch("fetchcode.vcs.vcs.get_backend_for_scheme")
 def test_fetch_with_svn_url_returns_a_response(mock_backend):
     mock_backend.return_value.obtain = obtain
-    url = "svn://bitbucket.com/jamesor/mongoose-versioner"
+    url = "svn+file://bitbucket.com/jamesor/mongoose-versioner"
     response = fetch_via_vcs(url=url)
     assert response.vcs_type == "svn"
     assert response.domain == "bitbucket.com"

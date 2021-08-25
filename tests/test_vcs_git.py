@@ -37,7 +37,7 @@ def test_fetch_with_git_http_url_returns_a_response(mock_backend):
 @mock.patch("fetchcode.vcs.git.vcs.get_backend")
 def test_fetch_with_git_url_returns_a_response(mock_backend):
     mock_backend.return_value.obtain = obtain
-    url = "git://github.com/jamesor/mongoose-versioner"
+    url = "git+git://github.com/jamesor/mongoose-versioner"
     response = fetch_via_git(url=url)
     assert response.vcs_type == "git"
     assert response.domain == "github.com"
