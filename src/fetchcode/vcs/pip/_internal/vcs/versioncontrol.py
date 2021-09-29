@@ -51,51 +51,6 @@ def is_url(name):
     return scheme in ["http", "https", "file", "ftp"] + vcs.all_schemes
 
 
-def make_vcs_requirement_url(repo_url, rev, project_name, subdir=None):
-    # type: (str, str, str, Optional[str]) -> str
-    """
-    Return the URL for a VCS requirement.
-
-    Args:
-      repo_url: the remote VCS url, with any needed VCS prefix (e.g. "git+").
-      project_name: the (unescaped) project name.
-    """
-    egg_project_name = project_name.replace("-", "_")
-    req = f"{repo_url}@{rev}#egg={egg_project_name}"
-    if subdir:
-        req += f"&subdirectory={subdir}"
-
-    return req
-
-
-def find_path_to_project_root_from_repo_root(location, repo_root):
-    # type: (str, str) -> Optional[str]
-    """
-    Find the the Python project's root by searching up the filesystem from
-    `location`. Return the path to project root relative to `repo_root`.
-    Return None if the project root is `repo_root`, or cannot be found.
-    """
-    # find project root.
-    orig_location = location
-    while not is_installable_dir(location):
-        last_location = location
-        location = os.path.dirname(location)
-        if location == last_location:
-            # We've traversed up to the root of the filesystem without
-            # finding a Python project.
-            logger.warning(
-                "Could not find a Python project for directory %s (tried all "
-                "parent directories)",
-                orig_location,
-            )
-            return None
-
-    if os.path.samefile(repo_root, location):
-        return None
-
-    return os.path.relpath(location, repo_root)
-
-
 class RemoteNotFoundError(Exception):
     pass
 
@@ -308,30 +263,6 @@ class VersionControl:
         """
         return cls.get_revision(repo_dir)
 
-    @classmethod
-    def get_src_requirement(cls, repo_dir, project_name):
-        # type: (str, str) -> str
-        """
-        Return the requirement string to use to redownload the files
-        currently at the given repository directory.
-
-        Args:
-          project_name: the (unescaped) project name.
-
-        The return value has a form similar to the following:
-
-            {repository_url}@{revision}#egg={project_name}
-        """
-        repo_url = cls.get_remote_url(repo_dir)
-
-        if cls.should_add_vcs_url_prefix(repo_url):
-            repo_url = f"{cls.name}+{repo_url}"
-
-        revision = cls.get_requirement_revision(repo_dir)
-        subdir = cls.get_subdirectory(repo_dir)
-        req = make_vcs_requirement_url(repo_url, revision, project_name, subdir=subdir)
-
-        return req
 
     @staticmethod
     def get_base_rev_args(rev):
