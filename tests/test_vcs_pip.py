@@ -10,7 +10,6 @@ import pytest
 
 from fetchcode.vcs.pip._internal.exceptions import BadCommand, InstallationError
 from fetchcode.vcs.pip._internal.utils.misc import hide_url, hide_value
-from fetchcode.vcs.pip._internal.vcs import make_vcs_requirement_url
 from fetchcode.vcs.pip._internal.vcs.bazaar import Bazaar
 from fetchcode.vcs.pip._internal.vcs.git import (
     Git,
@@ -29,36 +28,6 @@ from lib import is_svn_installed, need_svn
 def test_ensure_svn_available():
     """Make sure that svn is available when running in Travis."""
     assert is_svn_installed()
-
-
-@pytest.mark.parametrize(
-    "args, expected",
-    [
-        # Test without subdir.
-        (
-            ("git+https://example.com/pkg", "dev", "myproj"),
-            "git+https://example.com/pkg@dev#egg=myproj",
-        ),
-        # Test with subdir.
-        (
-            ("git+https://example.com/pkg", "dev", "myproj", "sub/dir"),
-            "git+https://example.com/pkg@dev#egg=myproj&subdirectory=sub/dir",
-        ),
-        # Test with None subdir.
-        (
-            ("git+https://example.com/pkg", "dev", "myproj", None),
-            "git+https://example.com/pkg@dev#egg=myproj",
-        ),
-        # Test an unescaped project name.
-        (
-            ("git+https://example.com/pkg", "dev", "zope-interface"),
-            "git+https://example.com/pkg@dev#egg=zope_interface",
-        ),
-    ],
-)
-def test_make_vcs_requirement_url(args, expected):
-    actual = make_vcs_requirement_url(*args)
-    assert actual == expected
 
 
 def test_rev_options_repr():
@@ -204,43 +173,6 @@ def test_git_remote_local_path(tmpdir):
     path.mkdir()
     # Path must exist to be recognised as a local git remote.
     assert Git._git_remote_to_pip_url(str(path)) == path.as_uri()
-
-
-@patch("fetchcode.vcs.pip._internal.vcs.git.Git.get_remote_url")
-@patch("fetchcode.vcs.pip._internal.vcs.git.Git.get_revision")
-@patch("fetchcode.vcs.pip._internal.vcs.git.Git.get_subdirectory")
-@pytest.mark.parametrize(
-    "git_url, target_url_prefix",
-    [
-        (
-            "https://github.com/pypa/pip-test-package",
-            "git+https://github.com/pypa/pip-test-package",
-        ),
-        (
-            "git@github.com:pypa/pip-test-package",
-            "git+ssh://git@github.com/pypa/pip-test-package",
-        ),
-    ],
-    ids=["https", "ssh"],
-)
-@pytest.mark.network
-def test_git_get_src_requirements(
-    mock_get_subdirectory,
-    mock_get_revision,
-    mock_get_remote_url,
-    git_url,
-    target_url_prefix,
-):
-    sha = "5547fa909e83df8bd743d3978d6667497983a4b7"
-
-    mock_get_remote_url.return_value = Git._git_remote_to_pip_url(git_url)
-    mock_get_revision.return_value = sha
-    mock_get_subdirectory.return_value = None
-
-    ret = Git.get_src_requirement(".", "pip-test-package")
-
-    target = f"{target_url_prefix}@{sha}#egg=pip_test_package"
-    assert ret == target
 
 
 @patch("fetchcode.vcs.pip._internal.vcs.git.Git.get_revision_sha")

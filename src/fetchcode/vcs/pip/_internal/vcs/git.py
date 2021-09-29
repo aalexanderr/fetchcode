@@ -15,7 +15,6 @@ from fetchcode.vcs.pip._internal.vcs.versioncontrol import (
     RemoteNotValidError,
     RevOptions,
     VersionControl,
-    find_path_to_project_root_from_repo_root,
     vcs,
 )
 
