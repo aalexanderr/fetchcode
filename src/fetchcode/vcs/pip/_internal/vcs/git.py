@@ -417,24 +417,6 @@ class Git(VersionControl):
         )
         return current_rev.strip()
 
-    @classmethod
-    def get_subdirectory(cls, location):
-        # type: (str) -> Optional[str]
-        """
-        Return the path to Python project root, relative to the repo root.
-        Return None if the project root is in the repo root.
-        """
-        # find the repo root
-        git_dir = cls.run_command(
-            ["rev-parse", "--git-dir"],
-            show_stdout=False,
-            stdout_only=True,
-            cwd=location,
-        ).strip()
-        if not os.path.isabs(git_dir):
-            git_dir = os.path.join(location, git_dir)
-        repo_root = os.path.abspath(os.path.join(git_dir, ".."))
-        return find_path_to_project_root_from_repo_root(location, repo_root)
 
     @classmethod
     def get_url_rev_and_auth(cls, url):
